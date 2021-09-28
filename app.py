@@ -5,6 +5,7 @@ import logging
 
 from application_services.imdb_artists_resource import IMDBArtistResource
 from application_services.UsersResource.user_service import UserResource
+from application_services.imdb_users_resource import IMDBUserResource
 from database_services.RDBService import RDBService as RDBService
 
 logging.basicConfig(level=logging.DEBUG)
@@ -33,12 +34,20 @@ def get_users():
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
+@app.route('/users/<prefix>')
+def get_users_resource(prefix):
+    res = IMDBUserResource.get_by_name_prefix(prefix)
+    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+    return rsp
+
 
 @app.route('/<db_schema>/<table_name>/<column_name>/<prefix>')
 def get_by_prefix(db_schema, table_name, column_name, prefix):
     res = RDBService.get_by_prefix(db_schema, table_name, column_name, prefix)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
+
+
 
 
 if __name__ == '__main__':

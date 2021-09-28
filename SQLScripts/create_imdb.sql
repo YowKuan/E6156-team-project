@@ -22,7 +22,7 @@
 
 DROP TABLE IF EXISTS `name_basics`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `name_basics` (
   `nconst` varchar(128) DEFAULT NULL,
   `primary_name` varchar(128) DEFAULT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE `name_basics` (
   `death_year` varchar(45) DEFAULT NULL,
   `primary_profession` varchar(128) DEFAULT NULL,
   `known_for_titles` varchar(128) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +39,7 @@ CREATE TABLE `name_basics` (
 
 DROP TABLE IF EXISTS `title_akas`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `title_akas` (
   `titleid` varchar(128) DEFAULT NULL,
   `ordering` varchar(128) DEFAULT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE `title_akas` (
   `types` varchar(512) DEFAULT NULL,
   `attributes` varchar(512) DEFAULT NULL,
   `is_original` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -58,7 +58,7 @@ CREATE TABLE `title_akas` (
 
 DROP TABLE IF EXISTS `title_basics`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `title_basics` (
   `tconst` varchar(64) NOT NULL,
   `ttype` varchar(64) DEFAULT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE `title_basics` (
   `runtime` varchar(45) DEFAULT NULL,
   `genres` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`tconst`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,12 +79,12 @@ CREATE TABLE `title_basics` (
 
 DROP TABLE IF EXISTS `title_crew`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `title_crew` (
   `tconst` varchar(128) DEFAULT NULL,
   `directors` text,
   `writer` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,14 +93,14 @@ CREATE TABLE `title_crew` (
 
 DROP TABLE IF EXISTS `title_episode`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `title_episode` (
   `tconst` varchar(128) NOT NULL,
   `parent` varchar(128) DEFAULT NULL,
   `season_number` text,
   `episode_number` text,
   PRIMARY KEY (`tconst`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -109,7 +109,7 @@ CREATE TABLE `title_episode` (
 
 DROP TABLE IF EXISTS `title_principals`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `title_principals` (
   `tconst` varchar(128) DEFAULT NULL,
   `ordering` varchar(45) DEFAULT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE `title_principals` (
   `category` text,
   `job` text,
   `characters` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -126,13 +126,13 @@ CREATE TABLE `title_principals` (
 
 DROP TABLE IF EXISTS `title_ratings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `title_ratings` (
   `tconst` varchar(128) NOT NULL,
   `rating` varchar(45) DEFAULT NULL,
   `votes` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`tconst`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
