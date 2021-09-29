@@ -17,6 +17,6 @@ class IMDBUserResource(BaseRDBApplicationResource):
 
     @classmethod
     def get_by_name_prefix(cls, name_prefix):
-        res = RDBService.get_by_prefix("cloud_computing", "user_info",
-                                      "nameLast", name_prefix)
+        res = RDBService.get_by_prefix("IMDBFixed", "names_basic_recent",
+                                      "primaryName", name_prefix)
         return res
