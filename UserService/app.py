@@ -104,7 +104,7 @@ def create_user():
         "id": next_id,
         "address_id": next_address_id
         })
-    return f"{firstName} are now a user! Checkout /api/user/{next_id}"
+    return f"{firstName} are now a user! Checkout /api/users/{next_id}"
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
