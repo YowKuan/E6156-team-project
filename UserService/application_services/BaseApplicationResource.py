@@ -27,6 +27,11 @@ class BaseApplicationResource(ABC):
     @abstractmethod
     def get_data_resource_info(self):
         pass
+    
+    @classmethod
+    @abstractmethod
+    def create_data_resource(cls, template):
+        pass
 
 
 class BaseRDBApplicationResource(BaseApplicationResource):
@@ -47,6 +52,13 @@ class BaseRDBApplicationResource(BaseApplicationResource):
         pass
 
     @classmethod
-    @abstractmethod
-    def get_data_resource_info(self):
-        pass
+    def create_data_resource(cls, template):
+        db_name, table_name = cls.get_data_resource_info()
+        res = RDBService.create(db_name, table_name, template)
+        return res
+    
+    @classmethod
+    def get_next_id(cls, id_column):
+        db_name, table_name = cls.get_data_resource_info()
+        res = RDBService.next_id(db_name, table_name, id_column)
+        return res
