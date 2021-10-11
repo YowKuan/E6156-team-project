@@ -56,7 +56,16 @@ def index():
 
 @app.route('/api/users', methods = ['GET'])
 def get_users():
-    res = UserResource.get_by_template(None)
+    if request.args.get('limit'):
+        limit = request.args.get('limit')
+    else:
+        limit = "10"
+    if request.args.get('offset'):
+        offset = request.args.get('offset')
+    else:
+        offset = "0"
+    
+    res = UserResource.get_by_template(None, limit, offset)
     for item in res:
         item["links"] = [
             {"rel": "self", "href": f"/api/users/{item['id']}"},
@@ -104,6 +113,7 @@ def create_user():
         "id": next_id,
         "address_id": next_address_id
         })
+    
     return f"{firstName} are now a user! Checkout /api/users/{next_id}"
 
 if __name__ == '__main__':
