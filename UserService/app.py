@@ -2,6 +2,7 @@ from application_services.imdb_artists_resource import IMDBArtistResource
 from application_services.UsersResource.user_service import UserResource, AddressResource
 from application_services.imdb_users_resource import IMDBUserResource
 from database_services.RDBService import RDBService as RDBService
+from middleware import security
 
 from flask import Flask, redirect, url_for, request, render_template, Response
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -27,6 +28,18 @@ blueprint = make_google_blueprint(
     scope=["profile", "email"]
 )
 app.register_blueprint(blueprint, url_prefix="/login")
+g_bp = app.blueprints.get("google")
+
+# @app.before_request
+# def before_request():
+#     print("running before_request")
+#     print(request)
+
+#     result = security.security_check(request, google, g_bp)
+    
+#     if not result:
+#         return redirect(url_for("google.login"))
+
 
 @app.route("/", methods = ['GET'])
 def hi():
