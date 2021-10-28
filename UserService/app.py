@@ -14,6 +14,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 app = Flask(__name__)
+CORS(app)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
@@ -81,7 +82,7 @@ def get_users_resource(prefix):
             {"rel": "self", "href": f"/api/users/{res[0]['id']}"},
             {"rel": "address", "href":f"/api/address/{res[0]['address_id']}"}
     ]
-    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+    rsp = Response(json.dumps(res[0], default=str), status=200, content_type="application/json")
     return rsp
 
 @app.route('/api/address/<prefix>', methods = ['GET'])
