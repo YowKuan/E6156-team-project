@@ -61,17 +61,25 @@ def get_users():
         limit = request.args.get('limit')
     else:
         limit = "10"
+        
     if request.args.get('offset'):
         offset = request.args.get('offset')
     else:
         offset = "0"
+        
+    if request.args.get('field'):
+        field_list = request.args.get('field').split(',')
+    else:
+        field_list = None
     
     res = UserResource.get_by_template(None, limit, offset)
-    for item in res:
-        item["links"] = [
-            {"rel": "self", "href": f"/api/users/{item['id']}"},
-            {"rel": "address", "href":f"/api/address/{item['address_id']}"}
+    for i in range(len(res)):
+        res[i]["links"] = [
+            {"rel": "self", "href": f"/api/users/{res[i]['id']}"},
+            {"rel": "address", "href":f"/api/address/{res[i]['address_id']}"}
         ]
+        if field_list is not None:
+            res[i] = { key: res[i][key] for key in field_list}
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 

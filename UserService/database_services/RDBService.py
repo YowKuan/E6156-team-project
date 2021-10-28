@@ -84,7 +84,7 @@ class RDBService:
         return clause, args
 
     @classmethod
-    def find_by_template(cls, db_schema, table_name, template, limit, offset, field_list):
+    def find_by_template(cls, db_schema, table_name, template, limit, offset):
 
         wc,args = RDBService.get_where_clause_args(template)
 
