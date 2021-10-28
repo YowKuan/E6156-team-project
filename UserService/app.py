@@ -108,22 +108,29 @@ def create_user():
     zip_code = request.form.get('zip')
     next_id = int(UserResource.get_next_id("id")[0]["max_id"]) + 1
     next_address_id = int(AddressResource.get_next_id("address_id")[0]["max_id"]) + 1
-
-    AddressResource.create_data_resource({
+    if not firstName or not lastName or not email or not address or not zip_code or not next_id or not next_address_id:
+        rsp = Response("Bad Data", status=400, content_type="application/json")
+        return rsp
+    user_created = AddressResource.create_data_resource({
         "address_id": next_address_id,
         "address": address,
         "zip": zip_code
         })
     
-    UserResource.create_data_resource({
+    address_created = UserResource.create_data_resource({
         "firstName": firstName,
         "lastName": lastName,
         "email": email,
         "id": next_id,
         "address_id": next_address_id
         })
-    
-    return f"{firstName} are now a user! Checkout /api/users/{next_id}"
+    if user_created and address_created:
+        res = {'location': f'/api/users/{next_id}'}
+        rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
+    else:
+        rsp = Response("Bad Data", status=400, content_type="application/json")
+    return rsp
+    # return f"{firstName} are now a user! Checkout /api/users/{next_id}"
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
