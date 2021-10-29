@@ -4,6 +4,8 @@ from application_services.imdb_users_resource import IMDBUserResource
 from database_services.RDBService import RDBService as RDBService
 from middleware import security
 
+import requests
+
 from flask import Flask, redirect, url_for, request, render_template, Response
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_cors import CORS
@@ -45,6 +47,16 @@ def before_request_func():
 def after_request_func(response):
     #call middleware notification here
     return response
+
+def check_address(address):
+    auth_id = "f281be3e-993d-5d27-d2a3-7c67b33127d1"
+    auth_token = "YoLWisKsQorvVAfPyYgK"
+    # suggest_numbers = 5
+    api_url =  "https://4dxhdlpw05.execute-api.us-east-1.amazonaws.com/test/smartystreet"
+    r = requests.get(api_url, params={'auth-id': auth_id, 'auth-token': auth_token,'address': address})
+    return r.json()
+
+
 
 
 
@@ -115,6 +127,12 @@ def create_user():
     zip_code = request.form.get('zip')
     next_id = int(UserResource.get_next_id("id")[0]["max_id"]) + 1
     next_address_id = int(AddressResource.get_next_id("address_id")[0]["max_id"]) + 1
+
+    valid_addr = check_address(address)
+    if not valid_addr:
+        return "The address is not valid"
+
+    
 
     AddressResource.create_data_resource({
         "address_id": next_address_id,
