@@ -3,10 +3,11 @@ import json
 
 class Secure:
     def __init__(self):
-        self.unsecure_paths = set(['/'])
+        self.unsecure_paths = set([])
 
     def security_check(self, request, google, blueprint):
         path = request.path
+        print(path)
         result = False
 
         if path in self.unsecure_paths:
@@ -15,6 +16,7 @@ class Secure:
             google_data = None
 
             user_info_endpoint = '/oauth2/v2/userinfo'
+            print(google.authorized)
 
             if google.authorized:
                 google_data = google.get(user_info_endpoint).json()

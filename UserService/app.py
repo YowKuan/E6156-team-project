@@ -31,15 +31,22 @@ blueprint = make_google_blueprint(
 app.register_blueprint(blueprint, url_prefix="/login")
 #print(app.blueprints)
 g_bp = app.blueprints.get("google")
+print("g_bp", g_bp)
 
 @app.before_request
 def before_request_func():
+    print(request.endpoint)
+    # if request.endpoint=='google.login' or request.endpoint=='google.authorized':
+    #     return 
     print("running before_request")
     check_box = security.Secure()
-    result = check_box.security_check(request, google, blueprint)
+    result = check_box.security_check(request, google, g_bp)
+    print("result", result)
     
-    if not result:
-        redirect(url_for("google.login"))
+    #To avoid infinite redirect, we need to check whether request.enpoint == google.login, if so, we shouldn't redirect again. Same as google.authorized
+    if not result and request.endpoint!='google.login' and request.endpoint!='google.authorized':
+        print("redirect to google")
+        return redirect(url_for("google.login"))
 
 @app.after_request
 def after_request_func(response):
@@ -48,14 +55,16 @@ def after_request_func(response):
 
 
 
+# @app.route("/", methods = ['GET'])
+# def hi():
+#     return "Hello, World!"
 @app.route("/", methods = ['GET'])
-def hi():
-    return "Hello, World!"
-
-@app.route("/index", methods = ['GET'])
 def index():
     google_data = google.get('/oauth2/v2/userinfo')
     assert google_data.ok, google_data.text
+    # print(json.dumps(google_data, indent=2))
+    # return "You are {email} on Google".format(email=google_data.json()["email"])
+    #res = UserResource.get_by_template({"email":google_data.json()["email"]}) # return list of dict
     res = UserResource.get_by_template({"email":google_data.json()["email"]}) # return list of dict
     if len(res) == 0:
         rsp = Response(json.dumps({
@@ -67,7 +76,6 @@ def index():
         rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
     return render_template("index.html", email=google_data.json()["email"])
-
 
 
 @app.route('/api/users', methods = ['GET'])
