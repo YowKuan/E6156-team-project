@@ -8,6 +8,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_cors import CORS
 import json, os
 import logging
+import pymysql
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -79,13 +80,26 @@ def get_users():
             {"rel": "address", "href":f"/api/address/{res[i]['address_id']}"}
         ]
         if field_list is not None:
-            res[i] = { key: res[i][key] for key in field_list}
-    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+            try:
+                res[i] = { key: res[i][key] for key in field_list}
+            except KeyError:
+                rsp = Response("404 not found", status=404, content_type="application/json")
+                return rsp
+    if len(res):
+        rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+    else:
+        rsp = Response("404 not found", status=404, content_type="application/json")
     return rsp
 
-@app.route('/api/users/<prefix>', methods = ['GET'])
-def get_users_resource(prefix):
-    res = UserResource.get_by_template({"id": prefix})
+@app.route('/api/users/<id>', methods = ['GET'])
+def get_users_resource(id):
+    if id.isdigit() is False:
+        rsp = Response("404 not found", status=404, content_type="application/json")
+        return rsp
+    res = UserResource.get_by_template({"id": id})
+    if len(res) == 0:
+        rsp = Response("404 not found", status=404, content_type="application/json")
+        return rsp
     res[0]["links"] = [
             {"rel": "self", "href": f"/api/users/{res[0]['id']}"},
             {"rel": "address", "href":f"/api/address/{res[0]['address_id']}"}
@@ -93,10 +107,16 @@ def get_users_resource(prefix):
     rsp = Response(json.dumps(res[0], default=str), status=200, content_type="application/json")
     return rsp
 
-@app.route('/api/address/<prefix>', methods = ['GET'])
-def get_address_resource(prefix):
-    res = AddressResource.get_by_template({"address_id": prefix})
-    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+@app.route('/api/address/<address_id>', methods = ['GET'])
+def get_address_resource(address_id):
+    if address_id.isdigit() is False:
+        rsp = Response("404 not found", status=404, content_type="application/json")
+        return rsp
+    res = AddressResource.get_by_template({"address_id": address_id})
+    if len(res) == 0:
+        rsp = Response("404 not found", status=404, content_type="application/json")
+    else:
+        rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
 @app.route('/api/create', methods = ['POST'])
@@ -108,29 +128,47 @@ def create_user():
     zip_code = request.form.get('zip')
     next_id = int(UserResource.get_next_id("id")[0]["max_id"]) + 1
     next_address_id = int(AddressResource.get_next_id("address_id")[0]["max_id"]) + 1
-    if not firstName or not lastName or not email or not address or not zip_code or not next_id or not next_address_id:
+    if firstName is None or firstName.isalpha() is False:
         rsp = Response("Bad Data", status=400, content_type="application/json")
         return rsp
-    user_created = AddressResource.create_data_resource({
-        "address_id": next_address_id,
-        "address": address,
-        "zip": zip_code
-        })
-    
-    address_created = UserResource.create_data_resource({
-        "firstName": firstName,
-        "lastName": lastName,
-        "email": email,
-        "id": next_id,
-        "address_id": next_address_id
-        })
-    if user_created and address_created:
-        res = {'location': f'/api/users/{next_id}'}
-        rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
-    else:
+    if lastName is None or lastName.isalpha() is False:
         rsp = Response("Bad Data", status=400, content_type="application/json")
+        return rsp
+    if email is None or email.count('@') != 1:
+        rsp = Response("Bad Data", status=400, content_type="application/json")
+        return rsp
+    if address is None: # Use external service to verify later
+        rsp = Response("Bad Data", status=400, content_type="application/json")
+        return rsp
+    if zip_code is None or zip_code.isdigit() is False:
+        rsp = Response("Bad Data", status=400, content_type="application/json")
+        return rsp
+    
+    try:
+        AddressResource.create_data_resource({
+            "address_id": next_address_id,
+            "address": address,
+            "zip": zip_code
+            })
+    except pymysql.err.IntegrityError:
+        rsp = Response("Unprocessable Entity", status=422, content_type="application/json")
+        return rsp
+    
+    try:
+        UserResource.create_data_resource({
+            "firstName": firstName,
+            "lastName": lastName,
+            "email": email,
+            "id": next_id,
+            "address_id": next_address_id
+            })
+    except pymysql.err.IntegrityError:
+        rsp = Response("Unprocessable Entity", status=422, content_type="application/json")
+        return rsp
+        
+    res = {'location': f'/api/users/{next_id}'}
+    rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
     return rsp
-    # return f"{firstName} are now a user! Checkout /api/users/{next_id}"
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
