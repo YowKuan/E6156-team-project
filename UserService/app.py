@@ -29,16 +29,23 @@ blueprint = make_google_blueprint(
     scope=["profile", "email"]
 )
 app.register_blueprint(blueprint, url_prefix="/login")
+#print(app.blueprints)
 g_bp = app.blueprints.get("google")
 
 @app.before_request
 def before_request_func():
     print("running before_request")
     check_box = security.Secure()
-    result = check_box.security_check(request, google, g_bp)
+    result = check_box.security_check(request, google, blueprint)
     
     if not result:
         redirect(url_for("google.login"))
+
+@app.after_request
+def after_request_func(response):
+    #call middleware notification here
+    return response
+
 
 
 @app.route("/", methods = ['GET'])
