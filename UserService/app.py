@@ -25,20 +25,20 @@ app.secret_key = "supersekrit"
 blueprint = make_google_blueprint(
     client_id=client_id,
     client_secret=client_secret,
+    reprompt_consent=True,
     scope=["profile", "email"]
 )
 app.register_blueprint(blueprint, url_prefix="/login")
 g_bp = app.blueprints.get("google")
 
-# @app.before_request
-# def before_request():
-#     print("running before_request")
-#     print(request)
-
-#     result = security.security_check(request, google, g_bp)
+@app.before_request
+def before_request_func():
+    print("running before_request")
+    check_box = security.Secure()
+    result = check_box.security_check(request, google, g_bp)
     
-#     if not result:
-#         return redirect(url_for("google.login"))
+    if not result:
+        redirect(url_for("google.login"))
 
 
 @app.route("/", methods = ['GET'])
@@ -47,13 +47,8 @@ def hi():
 
 @app.route("/index", methods = ['GET'])
 def index():
-    if not google.authorized:
-        return redirect(url_for("google.login"))
     google_data = google.get('/oauth2/v2/userinfo')
     assert google_data.ok, google_data.text
-    # print(json.dumps(google_data, indent=2))
-    # return "You are {email} on Google".format(email=google_data.json()["email"])
-    #res = UserResource.get_by_template({"email":google_data.json()["email"]}) # return list of dict
     res = UserResource.get_by_template({"email":google_data.json()["email"]}) # return list of dict
     if len(res) == 0:
         rsp = Response(json.dumps({
@@ -64,7 +59,7 @@ def index():
     else:
         rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
-    # return render_template("index.html", email=google_data.json()["email"])
+    return render_template("index.html", email=google_data.json()["email"])
 
 
 
@@ -131,4 +126,4 @@ def create_user():
     return f"{firstName} are now a user! Checkout /api/users/{next_id}"
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)

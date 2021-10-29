@@ -1,27 +1,29 @@
 import json
 
-unsecure_paths = []
 
-def security_check(request, google, blueprint):
-    path = request.path
-    result = False
+class Secure:
+    def __init__(self):
+        self.unsecure_paths = set(['/'])
 
-    if path in unsecure_paths:
-        result = True
-    else:
-        google_data = None
+    def security_check(self, request, google, blueprint):
+        path = request.path
+        result = False
 
-        user_info_endpoint = '/oauth2/v2/userinfo'
-
-        if google.authorized:
-            google_data = google.get(user_info_endpoint).json()
-            print(json.dumps(google_data, indent=2))
-
-            s = blueprint.session
-            t = s.token
-            print("Token", json.dumps(t, indent=2))
-
+        if path in self.unsecure_paths:
             result = True
-             
-    return result
+        else:
+            google_data = None
 
+            user_info_endpoint = '/oauth2/v2/userinfo'
+
+            if google.authorized:
+                google_data = google.get(user_info_endpoint).json()
+                print(json.dumps(google_data, indent=2))
+
+                s = blueprint.session
+                t = s.token
+                print("Token", json.dumps(t, indent=2))
+
+                result = True
+                
+        return result
